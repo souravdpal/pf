@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+    <script>
+        if (localStorage.getItem('isAdmin') == "false" || !localStorage.getItem('isAdmin')) {
+            window.location.href = '/u/admin'
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
+        <h1 class="text-2xl font-bold mb-6 text-center">Upload a Blog Post</h1>
+        <form id="blogForm" class="space-y-4">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">Blog Title (max 100
+                    characters)</label>
+                <input type="text" id="title" name="title" required maxlength="100"
+                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="summary" class="block text-sm font-medium text-gray-700">Summary</label>
+                <input type="text" id="sum" name="title" required maxlength="100"
+                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="content" class="block text-sm font-medium text-gray-700">Blog Content</label>
+                <div id="editor" class="mt-1 border border-gray-300 rounded-md" style="min-height: 250px;"></div>
+                <div id="wordCount" class="text-sm text-gray-500 mt-1">Words: 0</div>
+            </div>
+            <div>
+                <label for="image" class="block text-sm font-medium text-gray-700">Attach Featured Image (Optional, max
+                    5MB)</label>
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"
+                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                <div id="imagePreview" class="mt-2 hidden">
+                    <img id="previewImg" class="max-w-full h-auto rounded-md" alt="Image preview">
+                </div>
+            </div>
+            <button type="submit" id="submitBtn"
+                class="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400">
+                Submit Blog Post
+            </button>
+        </form>
+        <div id="response" class="mt-4 text-green-600 hidden"></div>
+        <div id="error" class="mt-4 text-red-600 hidden"></div>
+    </div>
+
+    <script>
+        let cheq = localStorage.getItem('isAdmin')
+        //alert(cheq)
+        if(cheq=="false"|| !cheq){
+            window.location.href='/u/admin'
+        }
+       
+
+        // Initialize Quill editor
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['link', 'blockquote', 'code-block'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['image', 'video'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Write your blog content here...',
+            bounds: '#editor'
+        });
+
+        // Update word count
+        function updateWordCount() {
+            const text = quill.getText().trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            document.getElementById('wordCount').textContent = `Words: ${words}`;
+        }
+
+        quill.on('text-change', updateWordCount);
+        updateWordCount();
+
+        // Handle image uploads within Quill
+        quill.getModule('toolbar').addHandler('image', function () {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/jpeg,image/png,image/gif');
+            input.click();
+            input.onchange = async () => {
+                const file = input.files[0];
+                const errorDiv = document.getElementById('error');
+                const error = validateImage(file);
+                if (error) {
+                    errorDiv.textContent = error;
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+
+                const uuid = generateUUID();
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('uuid', uuid);
+
+                try {
+                    const response = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to upload image');
+                    }
+                    const data = await response.json();
+                    const imageUrl = `/blog/${uuid}`;
+                    const range = quill.getSelection();
+                    quill.insertEmbed(range.index, 'image', imageUrl);
+                } catch (error) {
+                    errorDiv.textContent = `Error uploading image: ${error.message}`;
+                    errorDiv.classList.remove('hidden');
+                }
+            };
+        });
+
+        // Generate a random UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Validate file size and type
+        function validateImage(file) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (file.size > maxSize) {
+                return 'Image size must be less than 5MB';
+            }
+            if (!validTypes.includes(file.type)) {
+                return 'Image must be JPEG, PNG, or GIF';
+            }
+            return null;
+        }
+
+        // Show image preview for featured image
+        document.getElementById('image').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const previewDiv = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            if (file) {
+                const error = validateImage(file);
+                if (error) {
+                    document.getElementById('error').textContent = error;
+                    document.getElementById('error').classList.remove('hidden');
+                    event.target.value = '';
+                    previewDiv.classList.add('hidden');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewDiv.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewDiv.classList.add('hidden');
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('blogForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value.trim();
+            const summary = document.getElementById('sum').value.trim();
+            const content = quill.root.innerHTML;
+            const imageInput = document.getElementById('image');
+            const submitBtn = document.getElementById('submitBtn');
+            const responseDiv = document.getElementById('response');
+            const errorDiv = document.getElementById('error');
+            const imagePreview = document.getElementById('imagePreview');
+
+            responseDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            // Input validation
+            if (title.length < 3) {
+                errorDiv.textContent = 'Title must be at least 3 characters long';
+                errorDiv.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Blog Post';
+                return;
+            }
+            if (quill.getText().trim().length < 1) {
+                errorDiv.textContent = 'Content must be at least 50 characters long';
+                errorDiv.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Blog Post';
+                return;
+            }
+
+            const uuid = generateUUID();
+            const imageLink = imageInput.files.length > 0 ? `/blog/${uuid}` : '';
+
+            // Create JSON payload
+            const blogData = {
+                summary: summary,
+                title: title,
+                content: content,
+                image: imageLink,
+                createdAt: new Date().toISOString()
+            };
+            console.log(blogData)
+
+            try {
+                // Send JSON data to server
+                const dataResponse = await fetch('/api/blog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(blogData)
+                });
+
+                if (!dataResponse.ok) {
+                    const errorData = await dataResponse.json();
+                    throw new Error(errorData.message || 'Failed to upload blog data');
+                }
+
+                // If there's a featured image, send it to the image route
+                if (imageInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('image', imageInput.files[0]);
+                    formData.append('uuid', uuid);
+
+                    const imageResponse = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!imageResponse.ok) {
+                        const errorData = await imageResponse.json();
+                        throw new Error(errorData.message || 'Failed to upload image');
+                    }
+                }
+
+                responseDiv.textContent = 'Blog post uploaded successfully!';
+                responseDiv.classList.remove('hidden');
+                document.getElementById('blogForm').reset();
+                quill.setContents([]);
+                imagePreview.classList.add('hidden');
+                updateWordCount();
+            } catch (error) {
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Blog Post';
+            }
+        });
+    </script>
+</body>
+
+</html>

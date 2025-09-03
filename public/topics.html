@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link rel="stylesheet" href="/css/topics.css"> <!-- Assuming styles.css exists -->
+</head>
+<body>
+    <header>
+        <h1>My Blog</h1>
+        <nav>
+            <div class="hamburger">☰</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><button onclick="toggleDarkMode()"></button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="blog-posts">
+            <!-- Blog posts will be dynamically inserted here -->
+        </section>
+    </main>
+
+    <footer>
+        <button class="back-to-top" onclick="scrollToTop()">↑ Top</button>
+    </footer>
+
+    <script src="/js/top.js"></script>
+</body>
+</html>
