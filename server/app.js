@@ -1,52 +1,47 @@
 const express = require('express');
 const app = express();
-const path = require('path')
+const path = require('path');
 const { spawn } = require('child_process');
-const nodemailer = require('nodemailer');  // <--- this line was missing
+const nodemailer = require('nodemailer');
 require('dotenv').config();
-const PORT = process.env.port || 3000 || 6000
+const PORT = process.env.PORT || 3000;
 const mongo = require('mongoose');
-let admin = process.env.admin;
-let AdminKey = process.env.AdminKey;
 
-const { title } = require('process');
+const admin = process.env.ADMIN;
+const AdminKey = process.env.ADMIN_KEY;
 
-app.use(express.static(path.join(__dirname, '..', 'public')))
+app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
-
+// Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'main.html'))
-})
+    res.sendFile(path.join(__dirname, '..', 'public', 'main.html'));
+});
+
 app.get('/topics', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'topics.html'))
-})
+    res.sendFile(path.join(__dirname, '..', 'public', 'topics.html'));
+});
 
 app.get('/admin/panel', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'maker.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'maker.html'));
+});
 
-
-})
 app.get('/u/blog', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'blog.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'blog.html'));
+});
 
-
-})
 app.get('/u/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'));
+});
 
-
-})
 app.post('/admin/login', (req, res) => {
     let { username, password } = req.body;
 
     console.log("Username:", username);
     console.log("Password:", password);
 
-    if (password !== process.env.AdminKey) {
+    if (password !== process.env.ADMIN_KEY) {
         console.log('❌ Wrong password');
         return res.status(404).json({ message: "Invalid username or password" });
     }
@@ -55,140 +50,122 @@ app.post('/admin/login', (req, res) => {
     return res.status(200).json({ message: "Login successful" });
 });
 
-
 app.post('/api/hina-chat', (req, res) => {
-  const userMessage = req.body.message;
+    const userMessage = req.body.message;
+    const visitor_id = req.body.key;
 
-  const pythonChild = spawn('python3', ['hina_child.py', userMessage], {
-    env: { ...process.env, GROQ_API_KEY: process.env.GROQ_API_KEY }
-  });
+    const pythonChild = spawn('python3', ['child.py',visitor_id,userMessage], {
+        env: { ...process.env, GROQ_API_KEY: process.env.GROQ_API_KEY }
+    });
 
-  let aiReply = '';
+    let aiReply = '';
 
-  pythonChild.stdout.on('data', (data) => {
-    aiReply += data.toString();
-  });
+    pythonChild.stdout.on('data', (data) => {
+        aiReply += data.toString();
+    });
 
-  pythonChild.stderr.on('data', (data) => {
-    console.error('Python error:', data.toString());
-  });
+    pythonChild.stderr.on('data', (data) => {
+        console.error('Python error:', data.toString());
+    });
 
-  pythonChild.on('close', () => {
-    res.json({ reply: aiReply });
-  });
+    pythonChild.on('close', () => {
+        res.json({ reply: aiReply });
+    });
 
-  // Kill child after 5 seconds if still running
-  setTimeout(() => {
-    pythonChild.kill('SIGTERM');
-  }, 5000);
+    setTimeout(() => {
+        pythonChild.kill('SIGTERM');
+    }, 5000);
 });
-let mongo_connect = mongo.connect(process.env.URI || "mongodb://localhost:27017")
 
-if (mongo_connect) {
-    console.log('Db connected')
-} else {
-    console.log('db error')
-}
+// MongoDB connection
+mongo.connect(process.env.URI || "mongodb://localhost:27017")
+    .then(() => console.log('Db connected'))
+    .catch(err => console.error('db error:', err));
 
-let blogSchema = new mongo.Schema({
+// Blog schema
+const blogSchema = new mongo.Schema({
     title: String,
     content: String,
     image: String,
     createdAt: { type: Date, default: Date.now },
     summary: String
-})
+});
 
-
+const Blog = mongo.model('blog', blogSchema);
 
 // POST route for contact form
 app.post('/send-email', async (req, res) => {
     const { name, email, message } = req.body;
 
     try {
-        // Transporter setup (example uses Gmail)
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'sourav2026resolution@gmail.com',   // your email
-                pass: 'dntv fsyj ginj zqkl'      // use App Password, not normal password
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
-        // Email options
         let mailOptions = {
             from: `"${name}" <${email}>`,
-            to: 'sourav2026resolution@gmail.com',       // where you want to receive messages
+            to: process.env.EMAIL_USER,
             subject: 'New Contact Form Message',
             text: message,
             html: `<h3>Contact Form Submission</h3>
-             <p><strong>Name:</strong> ${name}</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Message:</strong><br>${message}</p>`
+                   <p><strong>Name:</strong> ${name}</p>
+                   <p><strong>Email:</strong> ${email}</p>
+                   <p><strong>Message:</strong><br>${message}</p>`
         };
 
-        // Send email
         await transporter.sendMail(mailOptions);
         console.log("✅ Email sent:", { name, email, message });
         res.json({ success: true, message: 'Email sent successfully!' });
-
     } catch (error) {
         console.error("❌ Error sending email:", error);
         res.status(500).json({ success: false, message: 'Error sending email.' });
     }
 });
 
+// POST route for blog
+app.post('/api/blog', async (req, res) => {
+    try {
+        const { title, summary, content } = req.body;
 
+        const newBlog = new Blog({
+            title,
+            content,
+            image: null, // No featured image; images are embedded in content
+            summary
+        });
 
-const blog = mongo.model('blog', blogSchema)
-app.post('/api/blog', (req, res) => {
+        await newBlog.save();
+        console.log("✅ Blog saved");
+        res.status(200).json({ msg: "Blog post created successfully" });
+    } catch (err) {
+        console.error("❌ Error saving blog:", err);
+        res.status(500).json({ msg: "Error saving blog" });
+    }
+});
 
-    let blogData = req.body;
-    let summaryB = blogData.summary;
-    let titleB = blogData.title;
-    let contentB = blogData.content;
-    let imageB = blogData.image ? blogData.image : null;
-    const newBlog = new blog({
-        title: titleB,
-        content: contentB,
-        image: imageB ? imageB : "null",
-        summary: summaryB
-    })
-
-    newBlog.save()
-        .then(() => {
-            console.log("✅ Blog saved")
-            res.status(200).json({ msg: "ok" })
-        })
-        .catch(err => console.error("❌ Error saving blog:", err));
-
-
-
-
-
-})
-// Get blogs with pagination (only summary info for indexing)
+// Get blogs with pagination
 app.get('/api/blogs', async (req, res) => {
     try {
-        // Extract query params ?page=1&limit=10
-        const page = parseInt(req.query.page) || 1;   // default page = 1
-        const limit = parseInt(req.query.limit) || 10; // default 10 posts per request
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        // Fetch only required blogs
-        const blogs = await blog.find({}, {
+        const blogs = await Blog.find({}, {
             _id: 1,
             title: 1,
             summary: 1,
             createdAt: 1
         })
-            .sort({ createdAt: -1 }) // newest first
+            .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        // Count total docs for frontend pagination
-        const total = await blog.countDocuments();
+        const total = await Blog.countDocuments();
 
-        // Format response
         const formatted = blogs.map(b => ({
             blogId: b._id,
             title: b.title,
@@ -213,37 +190,32 @@ app.get('/api/blogs', async (req, res) => {
 app.get('/blog/:postID', async (req, res) => {
     try {
         const postID = req.params.postID;
-        const singleBlog = await blog.findById(postID);
+        const singleBlog = await Blog.findById(postID);
 
         if (!singleBlog) {
             return res.status(404).json({ error: "Blog not found" });
         }
 
-        res.json(singleBlog); // send whole blog object
+        res.json(singleBlog);
     } catch (err) {
         console.error("❌ Error fetching blog:", err);
         res.status(500).json({ error: "Server error" });
     }
 });
-//redirects 
+
+// Redirects
 app.get('/aiova', (req, res) => {
-    res.redirect('https://github.com/souravdpal/space_verse')
+    res.redirect('https://github.com/souravdpal/space_verse');
+});
 
-
-})
 app.get('/improve', (req, res) => {
-    res.redirect('https://github.com/souravdpal/improve')
+    res.redirect('https://github.com/souravdpal/improve');
+});
 
-
-})
 app.get('/chat', (req, res) => {
-    res.redirect('https://hina-ai.onrender.com')
-
-
-})
-
-
+    res.redirect('https://hina-ai.onrender.com');
+});
 
 app.listen(PORT, () => {
-    console.log('http://127.0.0.1:3000')
-})
+    console.log(`http://127.0.0.1:${PORT}`);
+});

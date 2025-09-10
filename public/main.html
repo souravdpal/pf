@@ -1,675 +1,629 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon" />
 
-<head>
-  <meta charset="UTF-8">
-  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Portfolio</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <script>
-    if (!localStorage.getItem('isAdmin')) {
-      localStorage.setItem('isAdmin', false)
-    }
-  </script>
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .section {
-      min-height: 100vh;
-      padding: 4rem 1rem;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .navbar {
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(147, 51, 234, 0.9));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .float-btn {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: linear-gradient(135deg, #3b82f6, #9333ea);
-      color: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      animation: pulse 2s infinite;
-      z-index: 50;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .float-btn:hover {
-      transform: scale(1.2);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script>
+      if (!localStorage.getItem("isAdmin")) {
+        localStorage.setItem("isAdmin", false);
+      }
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
       }
 
-      50% {
-        transform: scale(1.05);
+      body {
+        font-family: "Poppins", sans-serif;
       }
 
-      100% {
-        transform: scale(1);
+      .section {
+        min-height: 100vh;
+        padding: 4rem 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
       }
-    }
 
-    .chat-modal {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      max-width: 400px;
-      height: 600px;
-      /* Increased height for better scroll room on desktop */
-      min-height: 400px;
-      background: #1f2937;
-      border-radius: 1rem 1rem 0 0;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(100%);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
+      .section.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-    .chat-modal.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+      .navbar {
+        background: linear-gradient(
+          135deg,
+          rgba(37, 99, 235, 0.9),
+          rgba(147, 51, 234, 0.9)
+        );
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
 
-    @media (max-width: 640px) {
+      .float-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: linear-gradient(135deg, #3b82f6, #9333ea);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        animation: pulse 2s infinite;
+        z-index: 50;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .float-btn:hover {
+        transform: scale(1.2);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.05);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
       .chat-modal {
-        max-width: 100%;
-        height: 90vh;
-        /* Increased to 90vh for fuller mobile experience */
-        border-radius: 0;
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 600px;
+        /* Increased height for better scroll room on desktop */
+        min-height: 400px;
+        background: #1f2937;
+        border-radius: 1rem 1rem 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
       }
-    }
 
-    .chat-header {
-      background: linear-gradient(135deg, #3b82f6, #9333ea);
-      padding: 1rem;
-      border-radius: 1rem 1rem 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .chat-body {
-      flex: 1 1 auto;
-      /* Enhanced flex for better growth and scrolling */
-      padding: 1rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      scrollbar-width: thin;
-      /* Slimmer scrollbar for modern look */
-      scrollbar-color: #3b82f6 #4b5563;
-    }
-
-    .chat-body::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .chat-body::-webkit-scrollbar-thumb {
-      background: #3b82f6;
-      border-radius: 3px;
-    }
-
-    .chat-body::-webkit-scrollbar-track {
-      background: #4b5563;
-    }
-
-    .chat-message {
-      max-width: 80%;
-      padding: 0.5rem 1rem;
-      border-radius: 0.75rem;
-      line-height: 1.5;
-    }
-
-    .chat-message.user {
-      background: #3b82f6;
-      align-self: flex-end;
-    }
-
-    .chat-message.bot {
-      background: #4b5563;
-      align-self: flex-start;
-    }
-
-    .chat-input {
-      padding: 1rem;
-      border-top: 1px solid #4b5563;
-      flex-shrink: 0;
-      /* Prevents input from shrinking */
-    }
-
-    .chat-input input {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #4b5563;
-      border-radius: 0.5rem;
-      background: #374151;
-      color: white;
-      transition: border-color 0.3s ease;
-    }
-
-    .chat-input input:focus {
-      border-color: #3b82f6;
-      outline: none;
-    }
-
-    .close-btn {
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: white;
-    }
-
-    .form-input {
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    }
-
-    .footer {
-      background: linear-gradient(135deg, #1e3a8a, #4c1d95);
-      padding: 2rem 0;
-    }
-
-    .footer a:hover i {
-      transform: scale(1.2);
-      color: #3b82f6;
-    }
-
-    .typing-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.2rem;
-      align-self: flex-start;
-      padding: 0.5rem 1rem;
-    }
-
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: #3b82f6;
-      border-radius: 50%;
-      animation: bounce 0.6s infinite alternate;
-    }
-
-    .typing-indicator span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing-indicator span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-      to {
-        transform: translateY(-4px);
+      .chat-modal.show {
+        opacity: 1;
+        transform: translateY(0);
       }
-    }
-  </style>
-</head>
 
-<body class="bg-gray-900 text-white">
-  <!-- Navigation Bar -->
-  <nav class="navbar p-4 sticky top-0 z-20">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="text-2xl font-bold"><i class="fa-solid fa-code mr-2"></i>My Portfolio</div>
-      <div class="md:hidden">
-        <button id="menu-toggle" class="focus:outline-none">
-          <i class="fa-solid fa-bars text-2xl"></i>
-        </button>
+      @media (max-width: 640px) {
+        .chat-modal {
+          max-width: 100%;
+          height: 90vh;
+          /* Increased to 90vh for fuller mobile experience */
+          border-radius: 0;
+        }
+      }
+
+      .chat-header {
+        background: linear-gradient(135deg, #3b82f6, #9333ea);
+        padding: 1rem;
+        border-radius: 1rem 1rem 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chat-body {
+        flex: 1 1 auto;
+        /* Enhanced flex for better growth and scrolling */
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        scrollbar-width: thin;
+        /* Slimmer scrollbar for modern look */
+        scrollbar-color: #3b82f6 #4b5563;
+      }
+
+      .chat-body::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-body::-webkit-scrollbar-thumb {
+        background: #3b82f6;
+        border-radius: 3px;
+      }
+
+      .chat-body::-webkit-scrollbar-track {
+        background: #4b5563;
+      }
+
+      .chat-message {
+        max-width: 80%;
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        line-height: 1.5;
+      }
+
+      .chat-message.user {
+        background: #3b82f6;
+        align-self: flex-end;
+      }
+
+      .chat-message.bot {
+        background: #4b5563;
+        align-self: flex-start;
+      }
+
+      .chat-input {
+        padding: 1rem;
+        border-top: 1px solid #4b5563;
+        flex-shrink: 0;
+        /* Prevents input from shrinking */
+      }
+
+      .chat-input input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #4b5563;
+        border-radius: 0.5rem;
+        background: #374151;
+        color: white;
+        transition: border-color 0.3s ease;
+      }
+
+      .chat-input input:focus {
+        border-color: #3b82f6;
+        outline: none;
+      }
+
+      .close-btn {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      .form-input {
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      }
+
+      .footer {
+        background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+        padding: 2rem 0;
+      }
+
+      .footer a:hover i {
+        transform: scale(1.2);
+        color: #3b82f6;
+      }
+
+      .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 0.2rem;
+        align-self: flex-start;
+        padding: 0.5rem 1rem;
+      }
+
+      .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background: #3b82f6;
+        border-radius: 50%;
+        animation: bounce 0.6s infinite alternate;
+      }
+
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes bounce {
+        to {
+          transform: translateY(-4px);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white">
+    <!-- Navigation Bar -->
+    <nav class="navbar p-4 sticky top-0 z-20">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="text-2xl font-bold">
+          <i class="fa-solid fa-code mr-2"></i>My Portfolio
+        </div>
+        <div class="md:hidden">
+          <button id="menu-toggle" class="focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+          </button>
+        </div>
+        <ul id="nav-links" class="hidden md:flex space-x-6">
+          <li>
+            <a href="#home" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-home mr-1"></i>Home</a
+            >
+          </li>
+          <li>
+            <a href="#skills" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-tools mr-1"></i>Skills</a
+            >
+          </li>
+          <li>
+            <a href="#projects" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-project-diagram mr-1"></i>Projects</a
+            >
+          </li>
+          <li>
+            <a href="/topics" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-pen-nib mr-1"></i>Blog</a
+            >
+          </li>
+
+          <li>
+            <a href="#about" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-user mr-1"></i>About</a
+            >
+          </li>
+          <li>
+            <a href="#contact" class="hover:text-blue-300 transition-colors"
+              ><i class="fa-solid fa-envelope mr-1"></i>Contact</a
+            >
+          </li>
+        </ul>
       </div>
-      <ul id="nav-links" class="hidden md:flex space-x-6">
-        <li><a href="#home" class="hover:text-blue-300 transition-colors"><i class="fa-solid fa-home mr-1"></i>Home</a>
-        </li>
-        <li><a href="#skills" class="hover:text-blue-300 transition-colors"><i
-              class="fa-solid fa-tools mr-1"></i>Skills</a></li>
-        <li><a href="#projects" class="hover:text-blue-300 transition-colors"><i
-              class="fa-solid fa-project-diagram mr-1"></i>Projects</a></li>
-        <li><a href="/topics" class="hover:text-blue-300 transition-colors"><i
-              class="fa-solid fa-pen-nib mr-1"></i>Blog</a></li>
+    </nav>
 
-        <li><a href="#about" class="hover:text-blue-300 transition-colors"><i
-              class="fa-solid fa-user mr-1"></i>About</a></li>
-        <li><a href="#contact" class="hover:text-blue-300 transition-colors"><i
-              class="fa-solid fa-envelope mr-1"></i>Contact</a></li>
-      </ul>
-    </div>
-  </nav>
+    <!-- Floating Talk to Hina Button -->
+    <button class="float-btn" id="talk-to-hina" title="Talk to Hina">
+      <i class="fa-solid fa-comment-dots text-2xl"></i>
+    </button>
 
-  <!-- Floating Talk to Hina Button -->
-  <button class="float-btn" id="talk-to-hina" title="Talk to Hina">
-    <i class="fa-solid fa-comment-dots text-2xl"></i>
-  </button>
-
-  <!-- Chat Modal -->
-  <div id="hina-modal" class="chat-modal">
-    <div class="chat-header">
-      <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-robot mr-2"></i>Hina - Your Guide</h2>
-      <span class="close-btn" id="close-modal">&times;</span>
-    </div>
-    <div class="chat-body" id="chat-body">
-      <div class="chat-message bot">
-        Hi! I'm Hina, your portfolio guide. Ask me about the projects, skills, or how to navigate the site!
+    <!-- Chat Modal -->
+    <div id="hina-modal" class="chat-modal">
+      <div class="chat-header">
+        <h2 class="text-xl font-bold text-white">
+          <i class="fa-solid fa-robot mr-2"></i>Hina - Your Guide
+        </h2>
+        <span class="close-btn" id="close-modal">&times;</span>
+      </div>
+      <div class="chat-body" id="chat-body">
+        <div class="chat-message bot">
+          Hi! I'm Hina, your portfolio guide. Ask me about the projects, skills,
+          or how to navigate the site!
+        </div>
+      </div>
+      <div class="chat-input">
+        <div class="typing-indicator" id="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+        <input
+          type="text"
+          id="chat-input"
+          placeholder="Type your message..."
+          autocomplete="off"
+        />
       </div>
     </div>
-    <div class="chat-input">
-      <div class="typing-indicator" id="typing-indicator">
-        <span></span><span></span><span></span>
-      </div>
-      <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
-    </div>
-  </div>
 
-  <!-- Home Section -->
-  <section id="home" class="section bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-    <div class="text-center">
-      <h1 class="text-5xl md:text-7xl font-bold mb-4 animate-fade-in"><i class="fa-solid fa-star mr-2"></i>Welcome to My
-        Portfolio</h1>
-      <p class="text-lg md:text-xl mb-6">Crafting innovative solutions with passion and creativity.</p>
-      <a href="#projects" class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-100 transition-colors"><i
-          class="fa-solid fa-rocket mr-1"></i>Explore My Work</a>
-    </div>
-  </section>
-
-  <!-- Skills Section -->
-  <section id="skills" class="section bg-gray-800">
-    <div class="container mx-auto">
-      <h2 class="text-4xl font-bold text-center text-blue-300 mb-8"><i class="fa-solid fa-tools mr-2"></i>My Skills</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-solid fa-code text-3xl text-blue-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-blue-300">Web Development</h3>
-          <p class="text-gray-300">HTML, CSS, JavaScript, Tailwind CSS</p>
-        </div>
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-solid fa-language text-3xl text-green-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-green-300">Languages</h3>
-          <p class="text-gray-300">Python, Java, JavaScript</p>
-        </div>
-
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-solid fa-database text-3xl text-blue-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-blue-300">Backend Development</h3>
-          <p class="text-gray-300">Node.js, Python, SQL</p>
-        </div>
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-solid fa-wrench text-3xl text-blue-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-blue-300">Tools & Frameworks</h3>
-          <p class="text-gray-300">Git, React, Docker , ollama , hugging face </p>
-        </div>
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-solid fa-brain text-3xl text-purple-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-purple-300">AI / ML</h3>
-          <p class="text-gray-300">numpy , transformers</p>
-        </div>
-        <div class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform">
-          <i class="fa-brands fa-linux text-3xl text-yellow-300 mb-2"></i>
-          <h3 class="text-xl font-semibold mb-2 text-yellow-300">Linux & Tools</h3>
-          <p class="text-gray-300">Linux, Bash, Arch , Kali , cybersecurity , Networking</p>
-        </div>
-
-
-      </div>
-    </div>
-  </section>
-  <!-- Projects Section -->
-  <section id="projects" class="section bg-gradient-to-br from-gray-800 to-gray-900 py-16">
-    <div class="container mx-auto px-6">
-      <!-- Title -->
-      <h2
-        class="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-400 mb-12">
-        <i class="fa-solid fa-project-diagram mr-3"></i>My Projects
-      </h2>
-
-      <!-- Project Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        <!-- Project Card -->
-        <div
-          class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-blue-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
-          <i class="fa-solid fa-laptop-code text-4xl text-blue-300 mb-4"></i>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300">Aiova</h3>
-          <p class="text-gray-300 mb-6 leading-relaxed">
-            Aiova is more than a platform—it's a <span class="text-blue-400">universe of imagination</span>.
-            Interact with legendary figures, fictional icons, or entirely new AI personas in real-time debates and
-            storytelling.
-          </p>
-          <a href="/aiova" target="_blank"
-            class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 font-medium transition">
-            <i class="fa-solid fa-link mr-2"></i>View Project
-          </a>
-        </div>
-
-        <!-- Project Card -->
-        <div
-          class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-purple-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
-          <i class="fa-solid fa-heart text-4xl text-purple-300 mb-4"></i>
-          <h3 class="text-2xl font-semibold mb-3 text-purple-300">SelfHelo</h3>
-          <p class="text-gray-300 mb-6 leading-relaxed">
-            SelfHelo is a <span class="text-purple-400">safe space</span> for those battling loneliness or addiction.
-            With AI therapist <strong>Hina</strong>, you can track moods, journal thoughts, and receive emotional
-            support.
-          </p>
-          <a href="/improve" target="_blank"
-            class="inline-flex items-center px-4 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 font-medium transition">
-            <i class="fa-solid fa-link mr-2"></i>View Project
-          </a>
-        </div>
-
-        <!-- Project Card -->
-        <div
-          class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-teal-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
-          <i class="fa-solid fa-comments text-4xl text-teal-300 mb-4"></i>
-          <h3 class="text-2xl font-semibold mb-3 text-teal-300">Chat-Hina</h3>
-          <p class="text-gray-300 mb-6 leading-relaxed">
-            My first fullstack AI project with <span class="text-teal-400">real-time chat</span>,
-            global discussions, friend requests, and even voice support.
-            Powered by sockets, WebRTC, and interactive AI assistant Hina.
-          </p>
-          <a href="/chat" target="_blank"
-            class="inline-flex items-center px-4 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 font-medium transition">
-            <i class="fa-solid fa-link mr-2"></i>View Project
-          </a>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- About Section -->
-  <section id="about" class="section bg-gradient-to-br from-gray-800 to-gray-900 py-16">
-    <div class="container mx-auto px-6 text-center">
-
-      <!-- Title -->
-      <h2
-        class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-400">
-        <i class="fa-solid fa-user mr-3"></i>About Me
-      </h2>
-
-      <!-- Content -->
-      <div
-        class="max-w-3xl mx-auto bg-gray-700/80 rounded-2xl shadow-lg p-8 backdrop-blur-sm border border-gray-600 hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-        <p class="text-lg md:text-xl text-gray-300 leading-relaxed">
-          Hi, I’m <span class="font-semibold text-blue-300">Sourav</span>, a
-          <span class="text-purple-300">developer & explorer</span> who loves turning ideas into reality through code.
-          I’m deeply passionate about <span class="text-teal-300">AI, web development, and Linux systems</span>, and I
-          thrive on
-          <span class="text-pink-300">solving complex problems</span> while constantly learning new technologies.
+    <!-- Home Section -->
+    <section
+      id="home"
+      class="section bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center"
+    >
+      <div class="text-center">
+        <h1 class="text-5xl md:text-7xl font-bold mb-4 animate-fade-in">
+          <i class="fa-solid fa-star mr-2"></i>Welcome to My Portfolio
+        </h1>
+        <p class="text-lg md:text-xl mb-6">
+          Crafting innovative solutions with passion and creativity.
         </p>
-
-        <p class="mt-6 text-gray-400 italic">
-          “Code is not just logic, it’s imagination made real.” 🚀
-        </p>
+        <a
+          href="#projects"
+          class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-100 transition-colors"
+          ><i class="fa-solid fa-rocket mr-1"></i>Explore My Work</a
+        >
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Contact Section -->
-  <section id="contact" class="section bg-gradient-to-br from-gray-800 to-gray-900">
-    <div class="container mx-auto">
-      <h2 class="text-4xl font-bold text-center text-blue-300 mb-8"><i class="fa-solid fa-envelope mr-2"></i>Get in
-        Touch</h2>
-      <div class="max-w-lg mx-auto">
-        <form id="main-contact-form" class="space-y-6">
-          <div>
-            <label class="block text-gray-300 mb-2" for="contact-name"><i class="fa-solid fa-user mr-1"></i>Name</label>
-            <input class="w-full p-3 border rounded form-input bg-gray-700 text-white" type="text" id="contact-name"
-              required>
+    <!-- Skills Section -->
+    <section id="skills" class="section bg-gray-800">
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center text-blue-300 mb-8">
+          <i class="fa-solid fa-tools mr-2"></i>My Skills
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-solid fa-code text-3xl text-blue-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-blue-300">
+              Web Development
+            </h3>
+            <p class="text-gray-300">HTML, CSS, JavaScript, Tailwind CSS</p>
           </div>
-          <div>
-            <label class="block text-gray-300 mb-2" for="contact-email"><i
-                class="fa-solid fa-envelope mr-1"></i>Email</label>
-            <input class="w-full p-3 border rounded form-input bg-gray-700 text-white" type="email" id="contact-email"
-              required>
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-solid fa-language text-3xl text-green-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-green-300">Languages</h3>
+            <p class="text-gray-300">Python, Java, JavaScript</p>
           </div>
-          <div>
-            <label class="block text-gray-300 mb-2" for="contact-message"><i
-                class="fa-solid fa-comment mr-1"></i>Message</label>
-            <textarea class="w-full p-3 border rounded form-input bg-gray-700 text-white" id="contact-message" rows="5"
-              required></textarea>
+
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-solid fa-database text-3xl text-blue-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-blue-300">
+              Backend Development
+            </h3>
+            <p class="text-gray-300">Node.js, Python, SQL</p>
           </div>
-          <button type="submit"
-            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors w-full"><i
-              class="fa-solid fa-paper-plane mr-1"></i>Send Message</button>
-        </form>
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-solid fa-wrench text-3xl text-blue-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-blue-300">
+              Tools & Frameworks
+            </h3>
+            <p class="text-gray-300">
+              Git, React, Docker , ollama , hugging face
+            </p>
+          </div>
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-solid fa-brain text-3xl text-purple-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-purple-300">AI / ML</h3>
+            <p class="text-gray-300">
+              numpy , transformers , matplotlib,API,AI security
+            </p>
+          </div>
+          <div
+            class="p-6 bg-gray-700 rounded-lg text-center transform hover:scale-105 transition-transform"
+          >
+            <i class="fa-brands fa-linux text-3xl text-yellow-300 mb-2"></i>
+            <h3 class="text-xl font-semibold mb-2 text-yellow-300">
+              Linux & Tools
+            </h3>
+            <p class="text-gray-300">
+              Linux, Bash, Arch , Kali , cybersecurity , Networking
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+    <!-- Projects Section -->
+    <section
+      id="projects"
+      class="section bg-gradient-to-br from-gray-800 to-gray-900 py-16"
+    >
+      <div class="container mx-auto px-6">
+        <!-- Title -->
+        <h2
+          class="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-400 mb-12"
+        >
+          <i class="fa-solid fa-project-diagram mr-3"></i>My Projects
+        </h2>
 
-  <!-- Footer -->
-  <footer class="footer text-center text-gray-300">
-    <div class="container mx-auto">
-      <div class="flex justify-center space-x-6 mb-4">
-        <a href="https://github.com/souravdpal" target="_blank" class="text-2xl"><i
-            class="fa-brands fa-github transition-transform"></i></a>
-        <a href="https://instagram.com/hackingcosmos" target="_blank" class="text-2xl"><i
-            class="fa-brands fa-instagram transition-transform"></i></a>
-        <a href="https://linkedin.com/in/souravdp" target="_blank" class="text-2xl"><i
-            class="fa-brands fa-linkedin transition-transform"></i></a>
-        <a href="https://x.com/notsrvsourav" target="_blank" class="text-2xl"><i
-            class="fa-brands fa-x-twitter transition-transform"></i></a>
+        <!-- Project Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Project Card -->
+          <div
+            class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-blue-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300"
+          >
+            <i class="fa-solid fa-laptop-code text-4xl text-blue-300 mb-4"></i>
+            <h3 class="text-2xl font-semibold mb-3 text-blue-300">Aiova</h3>
+            <p class="text-gray-300 mb-6 leading-relaxed">
+              Aiova is more than a platform—it's a
+              <span class="text-blue-400">universe of imagination</span>.
+              Interact with legendary figures, fictional icons, or entirely new
+              AI personas in real-time debates and storytelling.
+            </p>
+            <a
+              href="/aiova"
+              target="_blank"
+              class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 font-medium transition"
+            >
+              <i class="fa-solid fa-link mr-2"></i>View Project
+            </a>
+          </div>
+
+          <!-- Project Card -->
+          <div
+            class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-purple-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300"
+          >
+            <i class="fa-solid fa-heart text-4xl text-purple-300 mb-4"></i>
+            <h3 class="text-2xl font-semibold mb-3 text-purple-300">
+              SelfHelo
+            </h3>
+            <p class="text-gray-300 mb-6 leading-relaxed">
+              SelfHelo is a <span class="text-purple-400">safe space</span> for
+              those battling loneliness or addiction. With AI therapist
+              <strong>Hina</strong>, you can track moods, journal thoughts, and
+              receive emotional support.
+            </p>
+            <a
+              href="/improve"
+              target="_blank"
+              class="inline-flex items-center px-4 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 font-medium transition"
+            >
+              <i class="fa-solid fa-link mr-2"></i>View Project
+            </a>
+          </div>
+
+          <!-- Project Card -->
+          <div
+            class="p-6 bg-gray-700/80 rounded-2xl shadow-lg backdrop-blur-sm border border-gray-600 hover:border-teal-400 transform hover:-translate-y-2 hover:scale-105 transition-all duration-300"
+          >
+            <i class="fa-solid fa-comments text-4xl text-teal-300 mb-4"></i>
+            <h3 class="text-2xl font-semibold mb-3 text-teal-300">Chat-Hina</h3>
+            <p class="text-gray-300 mb-6 leading-relaxed">
+              My first fullstack AI project with
+              <span class="text-teal-400">real-time chat</span>, global
+              discussions, friend requests, and even voice support. Powered by
+              sockets, WebRTC, and interactive AI assistant Hina.
+            </p>
+            <a
+              href="/chat"
+              target="_blank"
+              class="inline-flex items-center px-4 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 font-medium transition"
+            >
+              <i class="fa-solid fa-link mr-2"></i>View Project
+            </a>
+          </div>
+        </div>
       </div>
-      <p>&copy; 2025 My Portfolio. All rights reserved.</p>
-    </div>
-  </footer>
-  <script>
-    const chatModal = document.getElementById('hina-modal');
-    const closeModal = document.getElementById('close-modal');
-    const chatBody = document.getElementById('chat-body');
-    const chatInput = document.getElementById('chat-input');
-    const typingIndicator = document.getElementById('typing-indicator');
+    </section>
 
-    // Close modal
-    closeModal.addEventListener('click', () => {
-      chatModal.style.display = 'none';
-    });
+    <!-- About Section -->
+    <section
+      id="about"
+      class="section bg-gradient-to-br from-gray-800 to-gray-900 py-16"
+    >
+      <div class="container mx-auto px-6 text-center">
+        <!-- Title -->
+        <h2
+          class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-400"
+        >
+          <i class="fa-solid fa-user mr-3"></i>About Me
+        </h2>
 
-    // Handle user input
-    chatInput.addEventListener('keypress', async (e) => {
-      if (e.key === 'Enter' && chatInput.value.trim() !== '') {
-        const userMessage = chatInput.value.trim();
+        <!-- Content -->
+        <div
+          class="max-w-3xl mx-auto bg-gray-700/80 rounded-2xl shadow-lg p-8 backdrop-blur-sm border border-gray-600 hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]"
+        >
+          <p class="text-lg md:text-xl text-gray-300 leading-relaxed">
+            Hi, I’m <span class="font-semibold text-blue-300">Sourav</span>, a
+            <span class="text-purple-300">developer & explorer</span> who loves
+            turning ideas into reality through code. I’m deeply passionate about
+            <span class="text-teal-300"
+              >AI, web development, and Linux systems</span
+            >, and I thrive on
+            <span class="text-pink-300">solving complex problems</span> while
+            constantly learning new technologies.
+          </p>
 
-        // Add user message to chat
-        chatBody.innerHTML += `<div class="chat-message user">${userMessage}</div>`;
-        chatInput.value = '';
-        chatBody.scrollTop = chatBody.scrollHeight;
+          <p class="mt-6 text-gray-400 italic">
+            “Code is not just logic, it’s imagination made real.” 🚀
+          </p>
+        </div>
+      </div>
+    </section>
 
-        // Show typing indicator
-        typingIndicator.style.display = 'flex';
+    <!-- Contact Section -->
+    <section
+      id="contact"
+      class="section bg-gradient-to-br from-gray-800 to-gray-900"
+    >
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center text-blue-300 mb-8">
+          <i class="fa-solid fa-envelope mr-2"></i>Get in Touch
+        </h2>
+        <div class="max-w-lg mx-auto">
+          <form id="main-contact-form" class="space-y-6">
+            <div>
+              <label class="block text-gray-300 mb-2" for="contact-name"
+                ><i class="fa-solid fa-user mr-1"></i>Name</label
+              >
+              <input
+                class="w-full p-3 border rounded form-input bg-gray-700 text-white"
+                type="text"
+                id="contact-name"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2" for="contact-email"
+                ><i class="fa-solid fa-envelope mr-1"></i>Email</label
+              >
+              <input
+                class="w-full p-3 border rounded form-input bg-gray-700 text-white"
+                type="email"
+                id="contact-email"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2" for="contact-message"
+                ><i class="fa-solid fa-comment mr-1"></i>Message</label
+              >
+              <textarea
+                class="w-full p-3 border rounded form-input bg-gray-700 text-white"
+                id="contact-message"
+                rows="5"
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors w-full"
+            >
+              <i class="fa-solid fa-paper-plane mr-1"></i>Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
 
-        try {
-          // Send message to server
-          const res = await fetch('/api/hina-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userMessage })
-          });
-          const data = await res.json();
-
-          // Hide typing indicator
-          typingIndicator.style.display = 'none';
-
-          // Show AI reply
-          chatBody.innerHTML += `<div class="chat-message bot">${data.reply}</div>`;
-          chatBody.scrollTop = chatBody.scrollHeight;
-
-        } catch (err) {
-          typingIndicator.style.display = 'none';
-          chatBody.innerHTML += `<div class="chat-message bot">❌ Error connecting to AI server.</div>`;
-          chatBody.scrollTop = chatBody.scrollHeight;
-          console.error(err);
-        }
-      }
-    });
-  </script>
-
-
-  <script>
-    // Toggle mobile menu
-    const menuToggle = document.getElementById('menu-toggle');
-    const navLinks = document.getElementById('nav-links');
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('hidden');
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
-        navLinks.classList.add('hidden');
-      });
-    });
-
-    // Section animation on scroll
-    const sections = document.querySelectorAll('.section');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
-    sections.forEach(section => observer.observe(section));
-
-    // Chat functionality
-    const talkBtn = document.getElementById('talk-to-hina');
-    //const chatModal = document.getElementById('hina-modal');
-    //const closeModal = document.getElementById('close-modal');
-    //const chatInput = document.getElementById('chat-input');
-    //const chatBody = document.getElementById('chat-body');
-    //const typingIndicator = document.getElementById('typing-indicator');
-
-    const responses = {
-      'hi|hello': 'Hey there! I’m Hina, your guide. Want to know about the portfolio or need help navigating?',
-      'portfolio|about': 'This portfolio showcases my skills, projects, and more! Try asking about "skills", "projects", or "contact".',
-      'skills': 'Check out the Skills section for a list of expertise like Web Development, Backend, and Tools. Want to scroll there? <a href="#skills" class="text-blue-300 hover:underline">Go to Skills</a>',
-      'projects': 'The Projects section highlights cool stuff like a React task app and a Python visualization tool. Curious? <a href="#projects" class="text-blue-300 hover:underline">See Projects</a>',
-      'contact': 'You can reach out via the Contact section or keep chatting with me! <a href="#contact" class="text-blue-300 hover:underline">Go to Contact</a>',
-      'default': 'Hmm, not sure about that one. Try asking about "portfolio", "skills", "projects", or "contact"!'
-    };
-
-    function addMessage(content, type) {
-      const message = document.createElement('div');
-      message.classList.add('chat-message', type);
-      message.innerHTML = content;
-      chatBody.appendChild(message);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function simulateTyping(response) {
-      typingIndicator.style.display = 'flex';
-      setTimeout(() => {
-        typingIndicator.style.display = 'none';
-        addMessage(response, 'bot');
-      }, 1000);
-    }
-
-    talkBtn.addEventListener('click', () => {
-      chatModal.style.display = 'flex'; /* Ensure flex display for better layout */
-      setTimeout(() => chatModal.classList.add('show'), 10);
-    });
-
-    closeModal.addEventListener('click', () => {
-      chatModal.classList.remove('show');
-      setTimeout(() => chatModal.style.display = 'none', 300);
-    });
-
-    window.addEventListener('click', (e) => {
-      if (e.target === chatModal) {
-        chatModal.classList.remove('show');
-        setTimeout(() => chatModal.style.display = 'none', 300);
-      }
-    });
-
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter' && chatInput.value.trim()) {
-        const userMessage = chatInput.value.trim();
-        addMessage(userMessage, 'user');
-        chatInput.value = '';
-
-        const lowerMessage = userMessage.toLowerCase();
-        let response = responses['default'];
-        for (const [key, value] of Object.entries(responses)) {
-          const keywords = key.split('|');
-          if (keywords.some(k => lowerMessage.includes(k))) {
-            response = value;
-            break;
-          }
-        }
-        simulateTyping(response);
-      }
-    });
-    // Main contact form submission
-    const mainContactForm = document.getElementById('main-contact-form');
-    mainContactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('contact-name').value;
-      const email = document.getElementById('contact-email').value;
-      const message = document.getElementById('contact-message').value;
-
-      try {
-        const response = await fetch('/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, message })
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert('✅ Message sent successfully!');
-          mainContactForm.reset();
-        } else {
-          alert('❌ Failed to send message.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('❌ Error sending message.');
-      }
-    });
-
-  </script>
-</body>
-
+    <!-- Footer -->
+    <footer class="footer text-center text-gray-300">
+      <div class="container mx-auto">
+        <div class="flex justify-center space-x-6 mb-4">
+          <a
+            href="https://github.com/souravdpal"
+            target="_blank"
+            class="text-2xl"
+            ><i class="fa-brands fa-github transition-transform"></i
+          ></a>
+          <a
+            href="https://instagram.com/itz_srvsourav"
+            target="_blank"
+            class="text-2xl"
+            ><i class="fa-brands fa-instagram transition-transform"></i
+          ></a>
+          <a
+            href="https://linkedin.com/in/souravdp"
+            target="_blank"
+            class="text-2xl"
+            ><i class="fa-brands fa-linkedin transition-transform"></i
+          ></a>
+          <a href="https://x.com/notsrvsourav" target="_blank" class="text-2xl"
+            ><i class="fa-brands fa-x-twitter transition-transform"></i
+          ></a>
+        </div>
+        <p>&copy; 2025 My Portfolio. All rights reserved.</p>
+      </div>
+    </footer>
+    <script src="/js/main.js"></script>
+  </body>
 </html>
