@@ -3,7 +3,15 @@ services:
     name: pf-server
     env: node
     rootDir: server
+    plan: free
     buildCommand: |
       npm install
       pip install -r requirements.txt
     startCommand: node app.js
+    envVars:
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: MONGO_URI
+        sync: false
