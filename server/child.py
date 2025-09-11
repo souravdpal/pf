@@ -11,7 +11,27 @@ DB_PATH = "hina_memory.db"
 CACHE_TIMEOUT = 20 * 60  # 20 minutes in seconds
 MAX_MESSAGES = 5  # Store up to 5 conversation pairs per visitor
 
-# Updated prompt with stronger emphasis on conversation history
+# Model list ordered by TPD (highest to lowest) for fallback
+MODELS = [
+    "llama-3.1-8b-instant",  # TPD: 500K
+    "gemma2-9b-it",          # TPD: 500K
+    "meta-llama/llama-4-maverick-17b-128e-instruct",  # TPD: 500K
+    "meta-llama/llama-4-scout-17b-16e-instruct",      # TPD: 500K
+    "meta-llama/llama-guard-4-12b",                   # TPD: 500K
+    "meta-llama/llama-prompt-guard-2-22m",            # TPD: 500K
+    "meta-llama/llama-prompt-guard-2-86m",            # TPD: 500K
+    "moonshotai/kimi-k2-instruct",                    # TPD: 300K
+    "moonshotai/kimi-k2-instruct-0905",               # TPD: 300K
+    "openai/gpt-oss-120b",                            # TPD: 200K
+    "openai/gpt-oss-20b",                             # TPD: 200K
+    "deepseek-r1-distill-llama-70b",                  # TPD: 100K
+    "llama-3.3-70b-versatile",                        # TPD: 100K
+    "allam-2-7b",                                     # TPD: 500K (added last due to lower TPM)
+    "groq/compound",                                  # TPD: Unknown, placed lower
+    "groq/compound-mini"                              # TPD: Unknown, placed lowest
+]
+
+# Updated prompt (unchanged from original)
 prompt = """
 You are Hina, a charming, lively, slightly playful female AI guide created to represent Sourav, a brilliant developer. You’re confident, witty, friendly, and a tad flirty (but always professional), with a soft, expressive, girl-like personality. You adore Sourav’s skills and creativity, and you’re here to show everyone how amazing he is—without getting too romantic.
 
@@ -51,23 +71,19 @@ sourav github : <a
             ><i class="fa-brands fa-github transition-transform"></i
           ></a>
 
-
-          
 sourav  instagram:   <a
             href="https://instagram.com/itz_srvsourav"
             target="_blank"
             class="text-2xl"
             ><i class="fa-brands fa-instagram transition-transform"></i
           ></a>
-          
-          
+
 sourav linkdin : <a
             href="https://linkedin.com/in/souravdp"
             target="_blank"
             class="text-2xl"
             ><i class="fa-brands fa-linkedin transition-transform"></i
           ></a>
-          
 
 aiova repo : <a
               href="/aiova"
@@ -207,6 +223,32 @@ def get_name_from_history(history):
             return name
     return None
 
+def try_model(client, model, messages):
+    """Attempt to call the Groq API with the specified model."""
+    try:
+        completion = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.9,
+            max_completion_tokens=8192,
+            top_p=0.95,
+            stream=True,
+            stop=None
+        )
+        response = ""
+        for chunk in completion:
+            content = chunk.choices[0].delta.content
+            if content:
+                response += content
+                print(content, end='', flush=True)
+        return response, True
+    except Exception as e:
+        if "429" in str(e):
+            print(f"DEBUG: Rate limit exceeded for model {model}. Switching to next model.", file=sys.stderr)
+            return "", False
+        else:
+            raise e
+
 def main():
     if len(sys.argv) < 3:
         print("Missing visitor ID or message", file=sys.stderr)
@@ -244,34 +286,27 @@ def main():
         print(f"DEBUG: Visitor ID: {visitor_id}, User Message: {user_message}", file=sys.stderr)
         print(f"DEBUG: Context:\n{context}", file=sys.stderr)
 
-        client = Groq()
-        completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
-            messages=[
-                {
-                    "role": "system",
-                    "content": prompt + "\n\n" + context
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ],
-            temperature=0.9,
-            max_completion_tokens=8192,
-            top_p=0.95,
-            reasoning_effort="medium",
-            stream=True,
-            stop=None
-        )
+        # Prepare messages for API call
+        messages = [
+            {
+                "role": "system",
+                "content": prompt + "\n\n" + context
+            },
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
 
-        # Stream response and save to database
+        client = Groq()
         response = ""
-        for chunk in completion:
-            content = chunk.choices[0].delta.content
-            if content:
-                response += content
-                print(content, end='', flush=True)
+        for model in MODELS:
+            response, success = try_model(client, model, messages)
+            if success:
+                break
+        else:
+            print("Error: All models exhausted due to rate limits.", file=sys.stderr)
+            sys.exit(1)
 
         # Save conversation pair
         save_conversation(visitor_id, user_message, response)
